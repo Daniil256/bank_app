@@ -1,0 +1,24 @@
+### Переменные
+@baseUrl = http://localhost:8080
+@contentType = text/plain
+
+
+POST {{baseUrl}}/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "daniil@email.com",
+  "password": "password"
+}
+
+
+
+###
+POST {{baseUrl}}/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "daniil1@email.com",
+  "password": "password"
+}
+
