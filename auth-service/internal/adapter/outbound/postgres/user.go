@@ -30,7 +30,7 @@ func (r *UserRepository) Create(ctx context.Context, u *domain.User) error {
 	if err != nil {
 		var pqErr *pq.Error
 		if errors.As(err, &pqErr) && pqErr.Code == "23505" { // unique_violation
-			return domain.ErrEmailTaken
+			return domain.ErrEmailExists
 		}
 		return fmt.Errorf("insert user: %w", err)
 	}
@@ -61,5 +61,30 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*domain
 	if err != nil {
 		return nil, fmt.Errorf("find user: %w", err)
 	}
+	return &u, nil
+}
+func (r *UserRepository) FindByID(ctx context.Context, id string) (*domain.User, error) {
+	fmt.Println("[repo] FindByID userId ", id)
+
+	query := `
+		SELECT id, email, password_hash, role, customer_id, created_at
+		FROM users
+		WHERE id = $1
+	`
+	var u domain.User
+
+	err := r.db.QueryRowContext(ctx, query, id).Scan(
+		&u.ID, &u.Email, &u.PasswordHash, &u.Role, &u.CustomerID, &u.CreatedAt,
+	)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		fmt.Println("[repo] FindByID user not found. userId ", id)
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &u, nil
 }

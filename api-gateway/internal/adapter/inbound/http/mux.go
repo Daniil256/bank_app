@@ -32,6 +32,7 @@ func NewMux(ctx context.Context, grpcEndpoint string) (http.Handler, error) {
 
 // errorHandler приводит ошибки gRPC к единому формату
 func errorHandler(ctx context.Context, mux *runtime.ServeMux, m runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
+	fmt.Println("[mux.errorHandler] detect error ", err)
 	st := statusFromErr(err)
 	code := runtime.HTTPStatusFromCode(st.Code())
 	msg := st.Message()

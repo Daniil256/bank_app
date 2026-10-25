@@ -1,17 +1,22 @@
 package main
 
 import (
+	"auth-service/internal/adapter/outbound/kafka"
+	"auth-service/internal/app/usecase"
+	"auth-service/migrations"
 	"database/sql"
 	"log"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
+
+	"github.com/pressly/goose/v3"
 
 	authv2 "auth-service/internal/adapter/inbound/grpc"
-	"auth-service/internal/adapter/outbound/kafka"
+	"auth-service/internal/adapter/outbound/jwt"
 	"auth-service/internal/adapter/outbound/postgres"
-	"auth-service/internal/app/usecase"
 	"auth-service/internal/config"
 	authv1 "auth-service/proto/auth/v1"
 
@@ -35,11 +40,35 @@ func main() {
 		log.Fatal("db ping:", err)
 	}
 
-	// Репозиторий, продюсер, use case
-	repo := postgres.NewUserRepository(db)
-	producer := kafka.NewProducer(cfg.KafkaBroker)
-	registerUC := usecase.NewRegisterUseCase(repo, producer)
-	loginUC := usecase.NewLoginUseCase(repo)
+	// Миграции БД
+	goose.SetBaseFS(migrations.FS)
+	if err := goose.SetDialect("postgres"); err != nil {
+		log.Fatal(err)
+	}
+	if err := goose.Up(db, "."); err != nil {
+		log.Fatal("migration failed: ", err)
+	}
+
+	// JWT signer
+	signer, err := jwt.NewSigner(
+		cfg.JWTPrivateKey, // "private.pem"
+		"auth-service",    // issuer
+		15*time.Minute,    // access TTL
+		7*24*time.Hour,    // refresh TTL
+	)
+	if err != nil {
+		log.Fatal("jwt signer:", err)
+	}
+
+	// Репозитории
+	userRepo := postgres.NewUserRepository(db)
+	refreshRepo := postgres.NewRefreshTokenRepository(db)
+
+	// Use cases
+	registerUC := usecase.NewRegisterUseCase(userRepo, kafka.NewProducer(cfg.KafkaBroker))
+	loginUC := usecase.NewLoginUseCase(userRepo, refreshRepo, signer, 7*24*time.Hour)
+	refreshUC := usecase.NewRefreshUseCase(refreshRepo, userRepo, signer, 7*24*time.Hour)
+	logoutUC := usecase.NewLogoutUseCase(refreshRepo)
 
 	// gRPC
 	lis, err := net.Listen("tcp", cfg.GRPCAddr)
@@ -48,7 +77,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	authv1.RegisterAuthServiceServer(grpcServer, authv2.NewAuthServer(registerUC, loginUC))
+	authv1.RegisterAuthServiceServer(grpcServer, authv2.NewAuthServer(registerUC, loginUC, refreshUC, logoutUC))
 
 	// Health check
 	healthServer := health.NewServer()

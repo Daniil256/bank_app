@@ -17,6 +17,15 @@ type JWTValidator struct {
 	publicKey *rsa.PublicKey
 }
 
+var publicPaths = [...]string{
+	"/v1/auth/register",
+	"/v1/auth/login",
+	"/v1/auth/refresh",
+	"/v1/auth/logout",
+	"/health",
+	"/ready",
+}
+
 func NewJWTValidator(publicKeyPath string) (*JWTValidator, error) {
 	data, err := os.ReadFile(publicKeyPath)
 	if err != nil {
@@ -54,7 +63,7 @@ func (v *JWTValidator) Middleware(next http.Handler) http.Handler {
 
 		tokenStr := strings.TrimPrefix(auth, "Bearer ")
 		claims := jwt.MapClaims{}
-		token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (any, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 			}
@@ -78,15 +87,8 @@ func (v *JWTValidator) Middleware(next http.Handler) http.Handler {
 }
 
 func isPublicPath(path string) bool {
-	public := []string{
-		"/v1/auth/register",
-		"/v1/auth/login",
-		"/v1/auth/refresh",
-		"/health",
-		"/ready",
-	}
-	for _, p := range public {
-		if strings.HasPrefix(path, p) {
+	for _, p := range publicPaths {
+		if path == p {
 			return true
 		}
 	}

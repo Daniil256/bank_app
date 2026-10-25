@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$PROJECT_DIR$/auth-service/internal/adapter/outbound/postgres/user.go" value="03d031d2-1195-4022-ab0d-c6c418155fef" />
+    <file url="file://$PROJECT_DIR$/auth-service/migrations/001_create_users.sql" value="03d031d2-1195-4022-ab0d-c6c418155fef" />
+    <file url="file://$PROJECT_DIR$/auth-service/migrations/002_create_refresh_tokens.sql" value="03d031d2-1195-4022-ab0d-c6c418155fef" />
+  </component>
+</project>

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"auth-service/internal/domain"
+
 	"golang.org/x/crypto/argon2"
 )
 
@@ -43,7 +44,7 @@ func (uc *RegisterUseCase) Execute(ctx context.Context, email, password string) 
 		return "", err
 	}
 	if exists {
-		return "", domain.ErrEmailTaken
+		return "", domain.ErrEmailExists
 	}
 
 	hash, err := hashPassword(password)

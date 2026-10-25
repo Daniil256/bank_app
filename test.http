@@ -7,7 +7,7 @@ POST {{baseUrl}}/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "daniil@email.com",
+  "email": "daniil1@email.com",
   "password": "password"
 }
 
@@ -22,3 +22,19 @@ Content-Type: application/json
   "password": "password"
 }
 
+
+###
+POST {{baseUrl}}/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "f996ae51535ed653adb019a0d800bec3a00330bafbc0133676dcf4e47469bccb"
+}
+
+###
+POST {{baseUrl}}/v1/auth/logout
+Content-Type: application/json
+
+{
+  "refresh_token": "1ffdc470f116fad8393865b3fd715ed1c4319e9beae49c963117f8b9cd4909bb"
+}

@@ -4,6 +4,7 @@ import (
 	myHttp "api-gateway/internal/adapter/inbound/http"
 	"api-gateway/internal/config"
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -31,8 +32,12 @@ func main() {
 	}
 
 	// Оборачиваем в middleware
-	handler := jwtValidator.Middleware(mux)
-
+	handler := mux
+	handler = jwtValidator.Middleware(handler) // JWT
+	//handler = rateLimiter.Middleware(handler)        // Rate limit
+	//handler = requestIDMiddleware(handler)           // Request-ID
+	//handler = accessLogMiddleware(handler)           // Access-логи
+	handler = auth.CORS(handler) // CORS — САМЫЙ ВНЕШНИЙ
 	srv := &http.Server{
 		Addr:    cfg.HTTPAddr,
 		Handler: handler,
@@ -40,7 +45,7 @@ func main() {
 
 	go func() {
 		log.Println("api-gateway started on", cfg.HTTPAddr)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatal(err)
 		}
 	}()
