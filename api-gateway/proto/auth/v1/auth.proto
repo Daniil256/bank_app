@@ -35,6 +35,13 @@ service AuthService {
       body: "*"
     };
   }
+
+  rpc CreateOfficer(CreateOfficerRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/officers"
+      body: "*"
+    };
+  }
 }
 
 message RegisterRequest {
@@ -63,4 +70,9 @@ message RefreshRequest {
 
 message LogoutRequest {
   string refresh_token = 1;
+}
+
+message CreateOfficerRequest {
+  string email    = 1;
+  string password = 2;
 }

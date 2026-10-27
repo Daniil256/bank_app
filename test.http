@@ -12,6 +12,28 @@ Content-Type: application/json
 }
 
 
+###
+POST {{baseUrl}}/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@bank.com",
+  "password": "12345678"
+}
+
+
+
+###
+POST {{baseUrl}}/v1/auth/officers
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4NTZlNjdkOC1iODMyLTRkNWQtOGQ2ZC1hMjk0YjJiYTA1YTkiLCJyb2xlIjoiQURNSU4iLCJjdXN0b21lcl9pZCI6ImU5ODIyNjExLWVkNjktNDA2MS1iZTZlLTc0NDI1MzY5ZDdjYiIsInR5cGUiOiJhY2Nlc3MiLCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJhdWQiOlsiYXBpLWdhdGV3YXkiXSwiZXhwIjoxNzkzMDg1NTEzLCJuYmYiOjE3OTMwODQ2MTMsImlhdCI6MTc5MzA4NDYxMywianRpIjoiMTc5MzA4NDYxMzgwMzI1MDMwMCJ9.aSubmRgJVOfVd2t4MXfdyuAqIuyaxNuCEpElTdR-C8085ISTv-O57f_qGMSlvOicJ9lsP_joDdzMuV-GvyF75czQY4EA8vSq0f1IE1b7NsTGjMQ8Ld_xCFsWGG1GdrivMe858lJxiPP5jZEhvkyOK65skaD5MDv0ZFjActgchBqQgZGVA8IC6Osg1-txZMUdTjA_Q6NWKLXSdf4f9YS0xcNGFy9xgJyJd8vKR7-gN2jHR1QxVPZ4cnY_foDiVgTq3CCIvFNR2TxTaC8iCipp3_KnVe7gNXZSv6n6oe2ZCKfmPncM7YAVdDvG5O7TqqRT-hkICeQNOOL2BYXXOwIhaw
+
+{
+  "email": "daniilOfficer@email.com",
+  "password": "password"
+}
+
+
 
 ###
 POST {{baseUrl}}/v1/auth/register
@@ -28,7 +50,7 @@ POST {{baseUrl}}/v1/auth/refresh
 Content-Type: application/json
 
 {
-  "refresh_token": "f996ae51535ed653adb019a0d800bec3a00330bafbc0133676dcf4e47469bccb"
+  "refresh_token": "7f828dcfb0601bc99cc0748b9817b7af8cd8ffc805835510550c2148841a775c"
 }
 
 ###
@@ -36,5 +58,5 @@ POST {{baseUrl}}/v1/auth/logout
 Content-Type: application/json
 
 {
-  "refresh_token": "1ffdc470f116fad8393865b3fd715ed1c4319e9beae49c963117f8b9cd4909bb"
+  "refresh_token": "75220203c86300f6dea954e3e33938029cd80ab8bc787b5d11a96ebb07ae38e1"
 }

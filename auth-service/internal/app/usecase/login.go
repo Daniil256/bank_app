@@ -19,7 +19,7 @@ type LoginUseCase struct {
 }
 
 type TokenSigner interface {
-	SignAccess(userID, role string) (string, int64, error)
+	SignAccess(userID, role, customerId string) (string, int64, error)
 	//SignRefresh(userID string) (string, error)
 }
 
@@ -51,10 +51,11 @@ func (uc *LoginUseCase) Execute(ctx context.Context, email, password string) (*d
 	}
 
 	if !verifyPassword(password, user.PasswordHash) {
+		fmt.Println("[login] verifyPassword error. password ", password, " hash ", user.PasswordHash)
 		return nil, domain.ErrInvalidCredentials
 	}
 	// Подписываем access
-	accessToken, expiresIn, err := uc.signer.SignAccess(user.ID, user.Role)
+	accessToken, expiresIn, err := uc.signer.SignAccess(user.ID, user.Role, user.CustomerID)
 	if err != nil {
 		fmt.Println("[login] SignAccess err ", err)
 		return nil, err

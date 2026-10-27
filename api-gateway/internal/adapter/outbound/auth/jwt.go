@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -10,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
-	"google.golang.org/grpc/metadata"
 )
 
 type JWTValidator struct {
@@ -46,6 +46,8 @@ func NewJWTValidator(publicKeyPath string) (*JWTValidator, error) {
 	return &JWTValidator{publicKey: rsaPub}, nil
 }
 
+type claimsKey struct{}
+
 // Middleware валидирует JWT и прокидывает claims в gRPC metadata
 func (v *JWTValidator) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -73,17 +75,17 @@ func (v *JWTValidator) Middleware(next http.Handler) http.Handler {
 			writeJSONError(w, http.StatusUnauthorized, "invalid token")
 			return
 		}
-
+		fmt.Println("[jwt.Middleware] claims ", claims)
 		// Пробрасываем JWT и claims в gRPC metadata
-		ctx := metadata.AppendToOutgoingContext(r.Context(),
-			"authorization", "Bearer "+tokenStr,
-			"x-user-id", getString(claims, "sub"),
-			"x-user-role", getString(claims, "role"),
-			"x-customer-id", getString(claims, "customer_id"),
-		)
+		ctx := context.WithValue(r.Context(), claimsKey{}, claims)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func ClaimsFromContext(ctx context.Context) (jwt.MapClaims, bool) {
+	claims, ok := ctx.Value(claimsKey{}).(jwt.MapClaims)
+	return claims, ok
 }
 
 func isPublicPath(path string) bool {

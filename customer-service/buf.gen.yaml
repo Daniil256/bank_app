@@ -1,0 +1,21 @@
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: customer-service/proto
+  disable:
+    - file_option: go_package_prefix
+      path: google/api
+    - file_option: go_package_prefix
+      path: google/protobuf
+plugins:
+  - remote: buf.build/protocolbuffers/go
+    out: proto
+    opt: paths=source_relative
+  - remote: buf.build/grpc/go
+    out: proto
+    opt: paths=source_relative
+  - remote: buf.build/grpc-ecosystem/gateway
+    out: proto
+    opt: paths=source_relative

@@ -1,0 +1,153 @@
+### ============================================
+### Переменные
+### ============================================
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### Замените на реальные значения из вашей БД
+@customerId = e9822611-ed69-4061-be6e-74425369d7cb
+@clientEmail = daniil1@email.com
+@clientPassword = password
+@accessToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNDdjYzEyMC1jMzQ3LTQ1ZmItYTE5OC1mMWJiMjcyNjhhYWYiLCJyb2xlIjoiQ0xJRU5UIiwiY3VzdG9tZXJfaWQiOiIyMjQ4YjZiYy1hNGI3LTQ3OTItYjE0OC0xNDViNTMyNjEwMzQiLCJ0eXBlIjoiYWNjZXNzIiwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwiYXVkIjpbImFwaS1nYXRld2F5Il0sImV4cCI6MTc5MzEyNDE1NiwibmJmIjoxNzkzMTIzMjU2LCJpYXQiOjE3OTMxMjMyNTYsImp0aSI6IjE3OTMxMjMyNTYzNjcwOTgyMDAifQ.R5SpoZl9E_VEyiNKGTL6eQbIxGjUrPuS29Axsk78TGN_DeHR_KWwywMXMosjTmPRlIyhbnXFMNkvC9QgTBCpxPT8693UpIT-epge-m6cjp9F4fAq7LCpjaxRJ6cBvCYT0_0StXboRrCNVtwkISJ--_ovZzjjb6_I4pOiILylUvasdtAkt1MuKg_qJjKdn9xYaWQEGjVMiujR7KmlJ9gkJ0bL2x6WzXNSQbObpewd11CSLWt82p8K9GwsQNoHKb9Q15eRZxB4931Yzkpw4x1qZ6q3_YyhQOz50CbO9Q3cEEEjHpadGY-XBHLOjU6ugv1167p2HjEdm43EIGZJGuXL2g
+
+@officerEmail = officer@bank.com
+@officerPassword = password123
+
+
+### ============================================
+### 0. Подготовка: логин CLIENT
+### ============================================
+
+# @name clientLogin
+POST {{baseUrl}}/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{clientEmail}}",
+  "password": "{{clientPassword}}"
+}
+
+###
+@clientToken = {{clientLogin.response.body.$.access_token}}
+
+
+### ============================================
+### 0. Подготовка: логин OFFICER
+### ============================================
+
+# @name officerLogin
+POST {{baseUrl}}/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{officerEmail}}",
+  "password": "{{officerPassword}}"
+}
+
+###
+@officerToken = {{officerLogin.response.body.$.access_token}}
+
+
+### ============================================
+### 1. GetCustomer — GET /v1/customers/{customer_id}
+###    CLIENT смотрит свой профиль
+### ============================================
+
+GET {{baseUrl}}/v1/customers/{{customerId}}
+Accept: {{contentType}}
+Authorization: Bearer {{accessToken}}
+### Ожидаемый ответ 200:
+# {
+#   "id": "...",
+#   "userId": "...",
+#   "firstName": "Daniil",
+#   "lastName": "Ivanov",
+#   "birthDate": "1990-01-01",
+#   "address": "Tbilisi, ...",
+#   "phone": "+995...",
+#   "citizenship": "GE",
+#   "status": "PROFILE_FILLED",
+#   "createdAt": "...",
+#   "updatedAt": "..."
+# }
+
+
+### ============================================
+### 2. UpdateProfile — PATCH /v1/customers/me
+###    CLIENT редактирует свой профиль
+### ============================================
+
+PATCH {{baseUrl}}/v1/customers/me
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "firstName": "Daniil",
+  "lastName": "Ivanov",
+  "birthDate": "1990-01-01",
+  "address": "Tbilisi, Rustaveli Ave 1",
+  "phone": "+995555123456",
+  "citizenship": "GE"
+}
+
+### Ожидаемый ответ 200:
+# {
+#   "id": "...",
+#   "userId": "...",
+#   "firstName": "Daniil",
+#   "lastName": "Ivanov",
+#   "birthDate": "1990-01-01",
+#   "address": "Tbilisi, Rustaveli Ave 1",
+#   "phone": "+995555123456",
+#   "citizenship": "GE",
+#   "status": "PROFILE_FILLED",
+#   ...
+# }
+#
+# Ошибки:
+# 403 PermissionDenied — роль не CLIENT
+# 412 FailedPrecondition — статус ON_KYC или ACTIVE
+# 400 InvalidArgument — пустые firstName/lastName, неверная дата
+
+
+### ============================================
+### 3. GetCustomerStatus — GET /v1/customers/{customer_id}/status
+###    Любой авторизованный смотрит статус
+### ============================================
+
+GET {{baseUrl}}/v1/customers/{{customerId}}/status
+Accept: {{contentType}}
+Authorization: Bearer {{accessToken}}
+### Ожидаемый ответ 200:
+# {
+#   "customerId": "...",
+#   "status": "PROFILE_FILLED"
+# }
+
+
+### ============================================
+### 4. ListCustomers — GET /v1/customers
+###    Только OFFICER/ADMIN. Фильтры + пагинация
+### ============================================
+
+GET {{baseUrl}}/v1/customers?status=ON_KYC&pageSize=20
+Accept: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+### Ожидаемый ответ 200:
+# {
+#   "customers": [
+#     {
+#       "id": "...",
+#       "userId": "...",
+#       "firstName": "...",
+#       "lastName": "...",
+#       "status": "ON_KYC",
+#       ...
+#     }
+#   ],
+#   "nextPageToken": "..."
+# }
+#
+# Ошибки:
+# 403 PermissionDenied — роль не OFFICER/ADMIN

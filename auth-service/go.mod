@@ -4,9 +4,11 @@ go 1.26.4
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.32.0
 	github.com/lib/pq v1.10.9
 	github.com/pressly/goose/v3 v3.29.0
 	golang.org/x/crypto v0.58.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
 )

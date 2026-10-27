@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/grpc/metadata"
+	"log"
 
 	"auth-service/internal/app/usecase"
 	"auth-service/internal/domain"
@@ -16,10 +18,11 @@ import (
 
 type AuthServer struct {
 	authv1.UnimplementedAuthServiceServer
-	register *usecase.RegisterUseCase
-	login    *usecase.LoginUseCase
-	refresh  *usecase.RefreshUseCase
-	logout   *usecase.LogoutUseCase
+	register      *usecase.RegisterUseCase
+	login         *usecase.LoginUseCase
+	refresh       *usecase.RefreshUseCase
+	logout        *usecase.LogoutUseCase
+	createOfficer *usecase.CreateOfficerUseCase
 }
 
 func NewAuthServer(
@@ -27,12 +30,14 @@ func NewAuthServer(
 	login *usecase.LoginUseCase,
 	refresh *usecase.RefreshUseCase,
 	logout *usecase.LogoutUseCase,
+	createOfficer *usecase.CreateOfficerUseCase,
 ) *AuthServer {
 	return &AuthServer{
-		register: register,
-		login:    login,
-		refresh:  refresh,
-		logout:   logout,
+		register:      register,
+		login:         login,
+		refresh:       refresh,
+		logout:        logout,
+		createOfficer: createOfficer,
 	}
 }
 
@@ -115,4 +120,32 @@ func (s *AuthServer) Logout(ctx context.Context, req *authv1.LogoutRequest) (*em
 		return nil, mapError(err)
 	}
 	return &emptypb.Empty{}, nil
+}
+
+func (s *AuthServer) CreateOfficer(ctx context.Context, req *authv1.CreateOfficerRequest) (*authv1.RegisterResponse, error) {
+	fmt.Println("[auth.CreateOfficer] CreateOfficerRequest ", req)
+	// 1. Извлекаем role из metadata (прокинут gateway)
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "missing metadata")
+	}
+	log.Println("[auth.CreateOfficer] metadata: ", md)
+
+	roles := md.Get("x-user-role")
+	if len(roles) == 0 {
+		return nil, status.Error(codes.Unauthenticated, "missing role")
+	}
+
+	// 2. Проверяем, что role == "ADMIN"
+	if roles[0] != domain.RoleAdmin {
+		return nil, status.Error(codes.PermissionDenied, "only ADMIN can create officers")
+	}
+
+	// 3. Создаём OFFICER
+	userID, err := s.createOfficer.Execute(ctx, req.Email, req.Password)
+	if err != nil {
+		return nil, mapError(err)
+	}
+
+	return &authv1.RegisterResponse{UserId: userID}, nil
 }

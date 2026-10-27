@@ -101,7 +101,7 @@ func (uc *RefreshUseCase) Execute(ctx context.Context, refreshToken string) (*do
 	}
 
 	// 7. Подписываем новый access
-	accessToken, expiresIn, err := uc.signer.SignAccess(user.ID, user.Role)
+	accessToken, expiresIn, err := uc.signer.SignAccess(user.ID, user.Role, user.CustomerID)
 	if err != nil {
 		fmt.Println("[refresh.Execute] SignAccess error ", err)
 		return nil, err

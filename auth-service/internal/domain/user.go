@@ -12,6 +12,8 @@ type User struct {
 }
 
 const RoleClient = "CLIENT"
+const RoleAdmin = "ADMIN"
+const RoleOfficer = "OFFICER"
 
 type TokenPair struct {
 	AccessToken  string

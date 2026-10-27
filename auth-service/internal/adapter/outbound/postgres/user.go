@@ -47,13 +47,13 @@ func (r *UserRepository) ExistsByEmail(ctx context.Context, email string) (bool,
 
 func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	query := `
-		SELECT id, email, password_hash, role, created_at
+		SELECT id, email, password_hash, customer_id, role, created_at
 		FROM users
 		WHERE email = $1
 	`
 	var u domain.User
 	err := r.db.QueryRowContext(ctx, query, email).Scan(
-		&u.ID, &u.Email, &u.PasswordHash, &u.Role, &u.CreatedAt,
+		&u.ID, &u.Email, &u.PasswordHash, &u.CustomerID, &u.Role, &u.CreatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil

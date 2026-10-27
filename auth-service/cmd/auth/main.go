@@ -69,6 +69,7 @@ func main() {
 	loginUC := usecase.NewLoginUseCase(userRepo, refreshRepo, signer, 7*24*time.Hour)
 	refreshUC := usecase.NewRefreshUseCase(refreshRepo, userRepo, signer, 7*24*time.Hour)
 	logoutUC := usecase.NewLogoutUseCase(refreshRepo)
+	createOfficerUC := usecase.NewCreateOfficerUseCase(userRepo)
 
 	// gRPC
 	lis, err := net.Listen("tcp", cfg.GRPCAddr)
@@ -77,7 +78,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	authv1.RegisterAuthServiceServer(grpcServer, authv2.NewAuthServer(registerUC, loginUC, refreshUC, logoutUC))
+	authv1.RegisterAuthServiceServer(grpcServer, authv2.NewAuthServer(registerUC, loginUC, refreshUC, logoutUC, createOfficerUC))
 
 	// Health check
 	healthServer := health.NewServer()
