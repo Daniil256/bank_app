@@ -1,9 +1,8 @@
 package usecase
 
 import (
-	"context"
-
 	"bank_app/shared/roles"
+	"context"
 	"customer-service/internal/domain"
 )
 
@@ -25,14 +24,8 @@ func NewListCustomersUseCase(repo CustomerListRepository) *ListCustomersUseCase 
 // Execute — возвращает список клиентов с фильтрами и пагинацией
 func (uc *ListCustomersUseCase) Execute(
 	ctx context.Context,
-	requesterRole string,
 	filter domain.ListFilter,
 ) (*domain.ListResult, error) {
-	// 1. Проверка роли — только OFFICER/ADMIN
-	if requesterRole != roles.Officer && requesterRole != roles.Admin {
-		return nil, domain.ErrAccessDenied
-	}
-
 	// 2. Нормализация фильтров
 	if filter.Limit <= 0 {
 		filter.Limit = 20

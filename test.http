@@ -2,17 +2,26 @@
 @baseUrl = http://localhost:8080
 @contentType = text/plain
 
-
+### CLIENT LOGIN
 POST {{baseUrl}}/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "daniil1@email.com",
+  "email": "daniil_user_2@email.com",
+  "password": "password"
+}
+
+### OFFICER LOGIN
+POST {{baseUrl}}/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "daniilOfficer@email.com",
   "password": "password"
 }
 
 
-###
+### ADMIN LOGIN
 POST {{baseUrl}}/v1/auth/login
 Content-Type: application/json
 
@@ -26,7 +35,7 @@ Content-Type: application/json
 ###
 POST {{baseUrl}}/v1/auth/officers
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4NTZlNjdkOC1iODMyLTRkNWQtOGQ2ZC1hMjk0YjJiYTA1YTkiLCJyb2xlIjoiQURNSU4iLCJjdXN0b21lcl9pZCI6ImU5ODIyNjExLWVkNjktNDA2MS1iZTZlLTc0NDI1MzY5ZDdjYiIsInR5cGUiOiJhY2Nlc3MiLCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJhdWQiOlsiYXBpLWdhdGV3YXkiXSwiZXhwIjoxNzkzMDg1NTEzLCJuYmYiOjE3OTMwODQ2MTMsImlhdCI6MTc5MzA4NDYxMywianRpIjoiMTc5MzA4NDYxMzgwMzI1MDMwMCJ9.aSubmRgJVOfVd2t4MXfdyuAqIuyaxNuCEpElTdR-C8085ISTv-O57f_qGMSlvOicJ9lsP_joDdzMuV-GvyF75czQY4EA8vSq0f1IE1b7NsTGjMQ8Ld_xCFsWGG1GdrivMe858lJxiPP5jZEhvkyOK65skaD5MDv0ZFjActgchBqQgZGVA8IC6Osg1-txZMUdTjA_Q6NWKLXSdf4f9YS0xcNGFy9xgJyJd8vKR7-gN2jHR1QxVPZ4cnY_foDiVgTq3CCIvFNR2TxTaC8iCipp3_KnVe7gNXZSv6n6oe2ZCKfmPncM7YAVdDvG5O7TqqRT-hkICeQNOOL2BYXXOwIhaw
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyODdjOTgzYS1iMGRjLTQ5M2YtYjg5Mi05MTliYmFkM2ZiMjMiLCJyb2xlIjoiQURNSU4iLCJ0eXBlIjoiYWNjZXNzIiwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwiYXVkIjpbImFwaS1nYXRld2F5Il0sImV4cCI6MTc5MzIwMDgxNywibmJmIjoxNzkzMTk5OTE3LCJpYXQiOjE3OTMxOTk5MTcsImp0aSI6IjE3OTMxOTk5MTcwNzI5NTU0MDAifQ.CGk5t8QjO9dNzmhBtJwjX_VVbIRX_a5eYKcIrSr_jB5wOolEWEeUbLv__hHWZZWzlJ4dBLnqg7HVjcD51RxFOuiKvcVggmAW_14mVognBf1lQ6NvEk9te9CGKkIWHl6-PZxhfOFqQcBOcjnjAw10wjecIj0HOYXThatc06O0kklyGfNgX-J5VVmrY2TqnmQW7yJRzqSGQjuDMF7oUNKb-diNIURk47zmWKwm3XskkJJ2fbxw0hQAc1JG2fvAdakpIF4FxZujhhiKW2o_QCjl-cUSiKJvMkk3ukI6X6-qUW5ASnkdxTPHRXRCbMC1kkqbsllFEB66sWg21__RGiw4ng
 
 {
   "email": "daniilOfficer@email.com",
@@ -38,9 +47,10 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4NTZlNjdkO
 ###
 POST {{baseUrl}}/v1/auth/register
 Content-Type: application/json
+#  "userId": "2d341f88-a0a2-4f78-bed9-50453fff8e00"
 
 {
-  "email": "daniil1@email.com",
+  "email": "daniil_user_2@email.com",
   "password": "password"
 }
 

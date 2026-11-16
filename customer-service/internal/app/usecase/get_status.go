@@ -14,8 +14,8 @@ func NewGetStatusUseCase(repo CustomerRepository) *GetStatusUseCase {
 	return &GetStatusUseCase{repo: repo}
 }
 
-func (uc *GetStatusUseCase) Execute(ctx context.Context, customerID string) (*domain.Customer, error) {
-	customer, err := uc.repo.GetByID(ctx, customerID)
+func (uc *GetStatusUseCase) Execute(ctx context.Context, userID string) (*domain.Customer, error) {
+	customer, err := uc.repo.GetByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

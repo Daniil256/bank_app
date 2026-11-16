@@ -1,30 +1,62 @@
 # bank_app/Makefile
 
-.PHONY: up down start-services run-gateway run-auth run-customer
+.PHONY: up down start-services start-infra run-gateway run-auth run-customer
 
-# 1. Поднять все контейнеры (БД, Kafka, Redis и т.д.)
+# ============================================
+# 1. Поднять ВСЕ контейнеры (БД для auth и customer)
+# ============================================
 up:
-	docker-compose up -d
+	@echo "Starting infrastructure (databases)..."
+	@docker compose -f customer-service/docker-compose.yml up -d
+	@docker compose -f auth-service/docker-compose.yml up -d
+	@docker compose -f kyc-service/docker-compose.yml up -d
+	@docker compose -f document-service/docker-compose.yml up -d
+	@echo "Infrastructure started"
 
-# 2. Остановить контейнеры
+# ============================================
+# 2. Остановить ВСЕ контейнеры
+# ============================================
 down:
-	docker-compose down
+	@echo "Stopping infrastructure..."
+	@cd auth-service && docker-compose down
+	@cd customer-service && docker-compose down
+	@cd kyc-service && docker-compose down
+	@cd document-service && docker-compose down
+	@echo "Infrastructure stopped"
 
-# 3. Запустить все Go-сервисы параллельно в фоне
-#    (каждый в своей подоболочке, чтобы не блокировать терминал)
-start-services:
+# ============================================
+# 3. Запустить все Go-сервисы (каждый в своём окне)
+#    pause — чтобы окно не закрылось при ошибке
+# ============================================
+run-services:
 	@echo "Starting all services..."
-	@(cd api-gateway && go run ./cmd/gateway) & \
-	 (cd auth-service && go run ./cmd/auth) & \
-	 (cd customer-service && go run ./cmd/customer) & \
-	 wait
+	@start "api-gateway" cmd /c "cd api-gateway && go run ./cmd/gateway & pause"
+	@start "auth-service" cmd /c "cd auth-service && go run ./cmd/auth & pause"
+	@start "customer-service" cmd /c "cd customer-service && go run ./cmd/customer & pause"
+	@start "kyc-service" cmd /c "cd kyc-service && go run ./cmd/kyc & pause"
+	@start "document-service" cmd /c "cd document-service && go run ./cmd/document & pause"
+	@echo "All services started in windows"
 
-# 4. Точечный запуск (если нужно отладить один сервис)
-run-gateway:
-	cd api-gateway && go run ./cmd/gateway
+# ============================================
+# 4. Поднять инфраструктуру + запустить сервисы
+# ============================================
+run-all: up run-services
+	@echo "Infrastructure + services started"
 
-run-auth:
-	cd auth-service && go run ./cmd/auth
+# ============================================
+# 5. Точечный запуск (для отладки)
+# ============================================
+run-g:
+	@start "api-gateway" cmd /c "cd api-gateway && go run ./cmd/gateway & pause"
 
-run-customer:
-	cd customer-service && go run ./cmd/customer
+run-a:
+	@start "auth-service" cmd /c "cd auth-service && go run ./cmd/auth & pause"
+
+run-c:
+	@start "customer-service" cmd /c "cd customer-service && go run ./cmd/customer & pause"
+
+run-k:
+	@start "kyc-service" cmd /c "cd kyc-service && go run ./cmd/kyc & pause"
+
+run-d:
+	@start "document-service" cmd /c "cd document-service && go run ./cmd/document & pause"

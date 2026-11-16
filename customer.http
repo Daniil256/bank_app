@@ -1,23 +1,18 @@
-### ============================================
-### Переменные
-### ============================================
 @baseUrl = http://localhost:8080
 @contentType = application/json
 
-### Замените на реальные значения из вашей БД
-@customerId = e9822611-ed69-4061-be6e-74425369d7cb
-@clientEmail = daniil1@email.com
+@user_id = b6edb92a-27ca-42b6-a88b-0dd59a4dc596
+@clientEmail = daniil_user@email.com
 @clientPassword = password
-@accessToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNDdjYzEyMC1jMzQ3LTQ1ZmItYTE5OC1mMWJiMjcyNjhhYWYiLCJyb2xlIjoiQ0xJRU5UIiwiY3VzdG9tZXJfaWQiOiIyMjQ4YjZiYy1hNGI3LTQ3OTItYjE0OC0xNDViNTMyNjEwMzQiLCJ0eXBlIjoiYWNjZXNzIiwiaXNzIjoiYXV0aC1zZXJ2aWNlIiwiYXVkIjpbImFwaS1nYXRld2F5Il0sImV4cCI6MTc5MzEyNDE1NiwibmJmIjoxNzkzMTIzMjU2LCJpYXQiOjE3OTMxMjMyNTYsImp0aSI6IjE3OTMxMjMyNTYzNjcwOTgyMDAifQ.R5SpoZl9E_VEyiNKGTL6eQbIxGjUrPuS29Axsk78TGN_DeHR_KWwywMXMosjTmPRlIyhbnXFMNkvC9QgTBCpxPT8693UpIT-epge-m6cjp9F4fAq7LCpjaxRJ6cBvCYT0_0StXboRrCNVtwkISJ--_ovZzjjb6_I4pOiILylUvasdtAkt1MuKg_qJjKdn9xYaWQEGjVMiujR7KmlJ9gkJ0bL2x6WzXNSQbObpewd11CSLWt82p8K9GwsQNoHKb9Q15eRZxB4931Yzkpw4x1qZ6q3_YyhQOz50CbO9Q3cEEEjHpadGY-XBHLOjU6ugv1167p2HjEdm43EIGZJGuXL2g
+@clientAccessToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiNmVkYjkyYS0yN2NhLTQyYjYtYTg4Yi0wZGQ1OWE0ZGM1OTYiLCJyb2xlIjoiQ0xJRU5UIiwidHlwZSI6ImFjY2VzcyIsImlzcyI6ImF1dGgtc2VydmljZSIsImF1ZCI6WyJhcGktZ2F0ZXdheSJdLCJleHAiOjE3OTMzODE1MDgsIm5iZiI6MTc5MzM4MDYwOCwiaWF0IjoxNzkzMzgwNjA4LCJqdGkiOiIxNzkzMzgwNjA4NDgzNDQ3NjAwIn0.PoIdbY2MuOdAc2fa8VVcAsytORkC87FR0k2ROKpPk6sGpASptRf9DJAhGrIlelBCJRSO0Qv-s4NRc7Tkw5vPjjD3lrhqGYvWjRmwVcAsO58wtYqVh8ZtbiemWkCdRlEAywoaLvi3eitd5H2RVUd2jK8cziCOHSH_g25FR_WoJnm3tFL1kvyLiLMsLTpjKY-nkEEhHS4Ydf7obJED2Rw1LZmgBeneAkVphzVsgotbhhzfnFVMIspV_Nijdd189UjQcho3K_E1IM7BgYv7SU5wKL-mhW_nNxvPOjs1cFaWVO4Sz7yZDfF64W1SrKApdLXtp_J_tcFye9Al5H560-WVAQ
 
-@officerEmail = officer@bank.com
-@officerPassword = password123
+#@officer_user_id = 2d341f88-a0a2-4f78-bed9-50453fff8e00
+@officerEmail = daniilOfficer@email.com
+@officerPassword = password
+@officerAccessToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4ODEwYjAyYi0zYTQ4LTQ2NDItYTBlMS0xYWQzMTY4NjI4NTEiLCJyb2xlIjoiT0ZGSUNFUiIsInR5cGUiOiJhY2Nlc3MiLCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJhdWQiOlsiYXBpLWdhdGV3YXkiXSwiZXhwIjoxNzkzNzI2NDg1LCJuYmYiOjE3OTM3MjU1ODUsImlhdCI6MTc5MzcyNTU4NSwianRpIjoiMTc5MzcyNTU4NTg4NjYyMjEwMCJ9.15uAlMQ16LycYkKA1HjnkdDs1TapmvS4cmSgoM9Vgp3KivVt-WhJ1OTKzCvNeT73Cbew8WBWmVIAXxgaYRQp9C1an1W1VRofQPn-ae_nbgKF9VKxUweZGW_nOpvZw3YcblF_Of_jNbisskeniQY0R5WbTlZt4AxGT8x9Ewo4up8zA6OlVeTff5Tvvp_H_o3fd5AJEkPA6OvkPp2jQOxjpaLSbcdCnM2MQVdL7T20S-EIHG0Ke9P69ykbnZCnshE1MYWtjXISWSiSdWBIuKA0rFOx9G2X2rYgxGkupuiCcVxMUW_mBUVxDRn5gBtA48eESFKssoNp7T9KfRBgbl3pdA
 
 
 ### ============================================
-### 0. Подготовка: логин CLIENT
-### ============================================
-
 # @name clientLogin
 POST {{baseUrl}}/v1/auth/login
 Content-Type: {{contentType}}
@@ -27,14 +22,8 @@ Content-Type: {{contentType}}
   "password": "{{clientPassword}}"
 }
 
-###
-@clientToken = {{clientLogin.response.body.$.access_token}}
-
 
 ### ============================================
-### 0. Подготовка: логин OFFICER
-### ============================================
-
 # @name officerLogin
 POST {{baseUrl}}/v1/auth/login
 Content-Type: {{contentType}}
@@ -44,110 +33,47 @@ Content-Type: {{contentType}}
   "password": "{{officerPassword}}"
 }
 
-###
-@officerToken = {{officerLogin.response.body.$.access_token}}
 
-
-### ============================================
-### 1. GetCustomer — GET /v1/customers/{customer_id}
-###    CLIENT смотрит свой профиль
-### ============================================
-
-GET {{baseUrl}}/v1/customers/{{customerId}}
+### ONLY OFFICER/ADMIN
+GET {{baseUrl}}/v1/customers/{{user_id}}
 Accept: {{contentType}}
-Authorization: Bearer {{accessToken}}
-### Ожидаемый ответ 200:
-# {
-#   "id": "...",
-#   "userId": "...",
-#   "firstName": "Daniil",
-#   "lastName": "Ivanov",
-#   "birthDate": "1990-01-01",
-#   "address": "Tbilisi, ...",
-#   "phone": "+995...",
-#   "citizenship": "GE",
-#   "status": "PROFILE_FILLED",
-#   "createdAt": "...",
-#   "updatedAt": "..."
-# }
+Authorization: Bearer {{officerAccessToken}}
 
 
-### ============================================
-### 2. UpdateProfile — PATCH /v1/customers/me
-###    CLIENT редактирует свой профиль
-### ============================================
+### ONLY CLIENT
+GET {{baseUrl}}/v1/customers/me
+Accept: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
 
+
+### ONLY CLIENT
 PATCH {{baseUrl}}/v1/customers/me
 Content-Type: {{contentType}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{clientAccessToken}}
 
 {
-  "firstName": "Daniil",
+  "firstName": "Daniil228",
   "lastName": "Ivanov",
-  "birthDate": "1990-01-01",
+  "birthDate": "1992-05-13",
   "address": "Tbilisi, Rustaveli Ave 1",
-  "phone": "+995555123456",
-  "citizenship": "GE"
+  "phone": "+9955ssxcsc55123456",
+  "citizenship": "GEo"
 }
 
-### Ожидаемый ответ 200:
-# {
-#   "id": "...",
-#   "userId": "...",
-#   "firstName": "Daniil",
-#   "lastName": "Ivanov",
-#   "birthDate": "1990-01-01",
-#   "address": "Tbilisi, Rustaveli Ave 1",
-#   "phone": "+995555123456",
-#   "citizenship": "GE",
-#   "status": "PROFILE_FILLED",
-#   ...
-# }
-#
-# Ошибки:
-# 403 PermissionDenied — роль не CLIENT
-# 412 FailedPrecondition — статус ON_KYC или ACTIVE
-# 400 InvalidArgument — пустые firstName/lastName, неверная дата
 
-
-### ============================================
-### 3. GetCustomerStatus — GET /v1/customers/{customer_id}/status
-###    Любой авторизованный смотрит статус
-### ============================================
-
-GET {{baseUrl}}/v1/customers/{{customerId}}/status
+### ONLY OFFICER/ADMIN
+GET {{baseUrl}}/v1/customers/{{user_id}}/status
 Accept: {{contentType}}
-Authorization: Bearer {{accessToken}}
-### Ожидаемый ответ 200:
-# {
-#   "customerId": "...",
-#   "status": "PROFILE_FILLED"
-# }
+Authorization: Bearer {{officerAccessToken}}
 
 
-### ============================================
-### 4. ListCustomers — GET /v1/customers
-###    Только OFFICER/ADMIN. Фильтры + пагинация
-### ============================================
-
-GET {{baseUrl}}/v1/customers?status=ON_KYC&pageSize=20
+### ONLY CLIENT
+GET {{baseUrl}}/v1/customers/me/status
 Accept: {{contentType}}
-Authorization: Bearer {{accessToken}}
+Authorization: Bearer {{clientAccessToken}}
 
-### Ожидаемый ответ 200:
-# {
-#   "customers": [
-#     {
-#       "id": "...",
-#       "userId": "...",
-#       "firstName": "...",
-#       "lastName": "...",
-#       "status": "ON_KYC",
-#       ...
-#     }
-#   ],
-#   "nextPageToken": "..."
-# }
-#
-# Ошибки:
-# 403 PermissionDenied — роль не OFFICER/ADMIN
+
+### ONLY OFFICER/ADMIN
+GET {{baseUrl}}/v1/customers?pageSize=20
+Accept: {{contentType}}
+Authorization: Bearer {{officerAccessToken}}

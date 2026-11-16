@@ -30,15 +30,21 @@ type UpdateProfileInput struct {
 	Citizenship string
 }
 
-func (uc *UpdateProfileUseCase) Execute(ctx context.Context, customerID string, in UpdateProfileInput) (*domain.Customer, error) {
-	if customerID == "" {
-		return nil, domain.ErrCustomerIDRequired
+func (uc *UpdateProfileUseCase) Execute(ctx context.Context, userId string, in UpdateProfileInput) (*domain.Customer, error) {
+	if userId == "" {
+		return nil, domain.ErrUserIDRequired
 	}
 
-	customer, err := uc.repo.GetByID(ctx, customerID)
+	// Валидация
+	if in.FirstName == "" && in.LastName == "" && in.BirthDate == "" && in.Address == "" && in.Phone == "" && in.Citizenship == "" {
+		return nil, domain.ErrInvalidProfile
+	}
+
+	customer, err := uc.repo.GetByID(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
+
 	if customer == nil {
 		return nil, domain.ErrNotFound
 	}
@@ -46,11 +52,6 @@ func (uc *UpdateProfileUseCase) Execute(ctx context.Context, customerID string, 
 	// Нельзя редактировать после ON_KYC
 	if customer.Status == roles.StatusOnKyc || customer.Status == roles.StatusActive {
 		return nil, domain.ErrCannotEditOnKyc
-	}
-
-	// Валидация
-	if in.FirstName == "" || in.LastName == "" {
-		return nil, domain.ErrInvalidProfile
 	}
 
 	// Парсим дату рождения

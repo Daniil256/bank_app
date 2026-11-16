@@ -1,0 +1,80 @@
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@user_id = b6edb92a-27ca-42b6-a88b-0dd59a4dc596
+@clientEmail = daniil_user@email.com
+@clientPassword = password
+@clientAccessToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiNmVkYjkyYS0yN2NhLTQyYjYtYTg4Yi0wZGQ1OWE0ZGM1OTYiLCJyb2xlIjoiQ0xJRU5UIiwidHlwZSI6ImFjY2VzcyIsImlzcyI6ImF1dGgtc2VydmljZSIsImF1ZCI6WyJhcGktZ2F0ZXdheSJdLCJleHAiOjE3OTQyMzc5NjcsIm5iZiI6MTc5NDIzNzA2NywiaWF0IjoxNzk0MjM3MDY3LCJqdGkiOiIxNzk0MjM3MDY3NTY4MzAxMzAwIn0.wOQ_TJV3MQns2rXGKHY-p0MBEr7pgQqgzx31BY9zSuZpN_UsbbVnPu5-3OSmq2MH-ItWDICmv5dWghUb4IPW7rq66Puk8JyAG8IWCnBZyYHz8vdRZlhw2UNHf1smy5XIZ2NZRcJpiayBuJe1pp8d10ftrmVKl5ykXw7_ZHukhUiRmWDI2bG76C8XDelMylv3T_n9QeQzWaaqhT1KTuu9avbf0s4VrzDHpQNaVbhuoHc9kYruikMkK4BCnVX9G-X4PfbIZULKnkLRXHTgTTYG7MtWaIVWKMm6rZ1GsmAn1NoWQSlA4w56Z0NHTaLCdu2gk587igt-sVMUJDddFAIqXg
+
+#@officer_user_id = 2d341f88-a0a2-4f78-bed9-50453fff8e00
+@officerEmail = daniilOfficer@email.com
+@officerPassword = password
+@officerAccessToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4ODEwYjAyYi0zYTQ4LTQ2NDItYTBlMS0xYWQzMTY4NjI4NTEiLCJyb2xlIjoiT0ZGSUNFUiIsInR5cGUiOiJhY2Nlc3MiLCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJhdWQiOlsiYXBpLWdhdGV3YXkiXSwiZXhwIjoxNzk0MjM3OTg0LCJuYmYiOjE3OTQyMzcwODQsImlhdCI6MTc5NDIzNzA4NCwianRpIjoiMTc5NDIzNzA4NDQyMTYwNTgwMCJ9.mWQotKiOdz_PvqY22f68VG6Heb6JcIkHH9ggM6aGR-Y7Vq82AcK3jVpJgim8ok01FJ-hQRPiTBd0OPNjQYHUpqYnK2KVmbusYDNEnreXnqNd-XzVZHkEk4fVg2s1c5u7NIlIq3oHG5iE0WOkA8iTIHdXHQI2N5jIx5sZ4z8D69iqVUs3j2lIk1h_4BixS7RHwKyTPKwRITwJKzxsAutvRM_RguQAQUpFfjP03tIzAo8ro-3knzaGuqE6yB85Nr88J749Mfj12pseCiI1VPNPFW4pphVk5tMQfqg_DD3Ha0rAJOBBgmj9iBqckBQisJuA_iu0mTTOeh2yvHZ3zKCvog
+
+@application_id = 01a1ac89-4aae-777a-9b4f-31ee2ecf36f4
+@application_id_r = 01a1ac98-bffd-7c33-adb4-c0af18dde9b8
+### ============================================
+# @name clientLogin
+POST {{baseUrl}}/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{clientEmail}}",
+  "password": "{{clientPassword}}"
+}
+
+
+### ============================================
+# @name officerLogin
+POST {{baseUrl}}/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{officerEmail}}",
+  "password": "{{officerPassword}}"
+}
+
+
+### ONLY CLIENT
+POST {{baseUrl}}/v1/kyc/applications
+Accept: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+#работает нестабльно
+
+### ONLY OFFICER/ADMIN
+GET {{baseUrl}}/v1/kyc/applications
+Accept: {{contentType}}
+Authorization: Bearer {{officerAccessToken}}
+
+
+### ONLY OFFICER/ADMIN
+GET {{baseUrl}}/v1/kyc/applications/{{application_id}}
+Accept: {{contentType}}
+Authorization: Bearer {{officerAccessToken}}
+
+
+### ONLY CLIENT
+GET {{baseUrl}}/v1/kyc/applications/me
+Accept: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+
+### ONLY OFFICER/ADMIN
+POST {{baseUrl}}/v1/kyc/applications/{{application_id_r}}/claim
+Accept: {{contentType}}
+Authorization: Bearer {{officerAccessToken}}
+
+
+### ONLY OFFICER/ADMIN
+POST {{baseUrl}}/v1/kyc/applications/{{application_id}}/approve
+Accept: {{contentType}}
+Authorization: Bearer {{officerAccessToken}}
+
+
+### Reject заявки
+POST {{baseUrl}}/v1/kyc/applications/{{application_id_r}}/reject
+Content-Type: application/json
+Authorization: Bearer {{officerAccessToken}}
+
+{
+  "reason": "Photo is unclear, please re-upload a better quality selfie"
+}

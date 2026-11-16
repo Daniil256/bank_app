@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 
-	"bank_app/shared/roles"
 	"customer-service/internal/domain"
 )
 
@@ -20,17 +19,8 @@ func NewGetCustomerUseCase(repo CustomerRepository) *GetCustomerUseCase {
 	return &GetCustomerUseCase{repo: repo}
 }
 
-func (uc *GetCustomerUseCase) Execute(ctx context.Context, customerID, requesterRole, requesterCustomerID string) (*domain.Customer, error) {
-	// CLIENT — только себя
-	if requesterRole == roles.Client && customerID != requesterCustomerID {
-		return nil, domain.ErrAccessDenied
-	}
-	// OFFICER/ADMIN — любого
-	if requesterRole != roles.Client && requesterRole != roles.Officer && requesterRole != roles.Admin {
-		return nil, domain.ErrAccessDenied
-	}
-
-	customer, err := uc.repo.GetByID(ctx, customerID)
+func (uc *GetCustomerUseCase) Execute(ctx context.Context, userID string) (*domain.Customer, error) {
+	customer, err := uc.repo.GetByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

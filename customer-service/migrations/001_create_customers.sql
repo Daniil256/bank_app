@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS customers
 (
-    id          UUID PRIMARY KEY     DEFAULT gen_random_uuid(),
+    id          UUID PRIMARY KEY     DEFAULT uuidv7(),
     user_id     UUID        NOT NULL UNIQUE,
     first_name  TEXT,
     last_name   TEXT,

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"customer-service/internal/domain"
 
@@ -22,24 +23,25 @@ func NewCustomerRepository(db *sql.DB) *CustomerRepository {
 func (r *CustomerRepository) GetByID(ctx context.Context, id string) (*domain.Customer, error) {
 	query := `
 		SELECT id, user_id, first_name, last_name, birth_date, address, phone, citizenship, status, created_at, updated_at
-		FROM customers WHERE id = $1
+		FROM customers WHERE user_id = $1
 	`
 	var c domain.Customer
-	var birthDate sql.NullTime
+	var firstName, lastName, address, phone, citizenship *string
+	var birthDate *time.Time
+
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
-		&c.ID, &c.UserID, &c.FirstName, &c.LastName, &birthDate,
-		&c.Address, &c.Phone, &c.Citizenship, &c.Status, &c.CreatedAt, &c.UpdatedAt,
+		&c.ID, &c.UserID,
+		&firstName, &lastName, &birthDate, &address, &phone, &citizenship,
+		&c.Status, &c.CreatedAt, &c.UpdatedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("get customer: %w", err)
+		return nil, fmt.Errorf("[customer.GetByID] err: %w", err)
 	}
-	if birthDate.Valid {
-		c.BirthDate = &birthDate.Time
-	}
-	return &c, nil
+
+	return resultToCustomer(c, firstName, lastName, address, phone, citizenship, birthDate), nil
 }
 
 func (r *CustomerRepository) Create(ctx context.Context, c *domain.Customer) error {
@@ -93,8 +95,9 @@ func (r *CustomerRepository) List(ctx context.Context, f domain.ListFilter) (*do
 		SELECT id, user_id, first_name, last_name, birth_date, address, phone,
 		       citizenship, status, created_at, updated_at
 		FROM customers
+		WHERE 1=1
 	`
-	args := []interface{}{}
+	var args []interface{}
 	i := 1
 
 	if f.Status != "" {
@@ -118,32 +121,40 @@ func (r *CustomerRepository) List(ctx context.Context, f domain.ListFilter) (*do
 		i++
 	}
 	query += fmt.Sprintf(" ORDER BY id ASC LIMIT $%d", i)
-	args = append(args, f.Limit+1) // +1 чтобы понять, есть ли следующая страница
-
+	args = append(args, f.Limit+1) // +1, чтобы понять, есть ли следующая страница
+	fmt.Println("query12 ", query)
+	fmt.Println("query12 ", args)
 	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return &domain.ListResult{}, nil
+		}
 		return nil, fmt.Errorf("list customers: %w", err)
+	}
+	if rows == nil {
+		return &domain.ListResult{}, nil
 	}
 	defer rows.Close()
 
 	var out []domain.Customer
 	for rows.Next() {
 		var c domain.Customer
-		var birthDate sql.NullTime
+		var firstName, lastName, address, phone, citizenship *string
+		var birthDate *time.Time
 		if err := rows.Scan(
-			&c.ID, &c.UserID, &c.FirstName, &c.LastName, &birthDate,
-			&c.Address, &c.Phone, &c.Citizenship, &c.Status, &c.CreatedAt, &c.UpdatedAt,
+			&c.ID, &c.UserID,
+			&firstName, &lastName, &birthDate, &address, &phone, &citizenship,
+			&c.Status, &c.CreatedAt, &c.UpdatedAt,
 		); err != nil {
 			return nil, fmt.Errorf("scan customer: %w", err)
 		}
-		if birthDate.Valid {
-			c.BirthDate = &birthDate.Time
-		}
-		out = append(out, c)
+
+		out = append(out, *resultToCustomer(c, firstName, lastName, address, phone, citizenship, birthDate))
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
+	fmt.Println("query12 ", out)
 
 	res := &domain.ListResult{}
 	if len(out) > f.Limit {
@@ -152,4 +163,26 @@ func (r *CustomerRepository) List(ctx context.Context, f domain.ListFilter) (*do
 	}
 	res.Customers = out
 	return res, nil
+}
+
+func resultToCustomer(c domain.Customer, firstName, lastName, address, phone, citizenship *string, birthDate *time.Time) *domain.Customer {
+	if firstName != nil {
+		c.FirstName = *firstName
+	}
+	if lastName != nil {
+		c.LastName = *lastName
+	}
+	if birthDate != nil {
+		c.BirthDate = birthDate
+	}
+	if address != nil {
+		c.Address = *address
+	}
+	if phone != nil {
+		c.Phone = *phone
+	}
+	if citizenship != nil {
+		c.Citizenship = *citizenship
+	}
+	return &c
 }

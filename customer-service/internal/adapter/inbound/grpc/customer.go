@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 	"errors"
+	"fmt"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"bank_app/shared/roles"
 	"customer-service/internal/app/usecase"
@@ -20,7 +22,6 @@ type CustomerServer struct {
 	updateProfile *usecase.UpdateProfileUseCase
 	getStatus     *usecase.GetStatusUseCase
 	listCustomers *usecase.ListCustomersUseCase // ← 4-й
-
 }
 
 func NewCustomerServer(
@@ -38,31 +39,57 @@ func NewCustomerServer(
 }
 
 func (s *CustomerServer) GetCustomer(ctx context.Context, req *customerv1.GetCustomerRequest) (*customerv1.Customer, error) {
+	fmt.Println("[GetCustomer] req", req)
 	md, _ := metadata.FromIncomingContext(ctx)
 	role := getMeta(md, "x-user-role")
-	requesterCustomerID := getMeta(md, "x-customer-id")
 
-	customer, err := s.getCustomer.Execute(ctx, req.CustomerId, role, requesterCustomerID)
+	if role != roles.Admin && role != roles.Officer {
+		return nil, mapError(domain.ErrAccessDenied)
+	}
+
+	customer, err := s.getCustomer.Execute(ctx, req.UserId)
 	if err != nil {
+		fmt.Println("[GetCustomer] Execute err", err)
 		return nil, mapError(err)
 	}
-	return toProto(customer), nil
+	proto, err := toProto(customer)
+	if err != nil {
+		fmt.Println("[GetCustomer] err toProto", err)
+	}
+	return proto, nil
 }
 
-func (s *CustomerServer) UpdateProfile(ctx context.Context, req *customerv1.UpdateProfileRequest) (*customerv1.Customer, error) {
+func (s *CustomerServer) GetClient(ctx context.Context, req *emptypb.Empty) (*customerv1.Client, error) {
+	fmt.Println("[GetClient] req", req)
 	md, _ := metadata.FromIncomingContext(ctx)
 	role := getMeta(md, "x-user-role")
-	customerID := getMeta(md, "x-customer-id")
+
+	if role != roles.Client {
+		return nil, mapError(domain.ErrAccessDenied)
+	}
+
+	requesterUserID := getMeta(md, "x-user-id")
+	customer, err := s.getCustomer.Execute(ctx, requesterUserID)
+	if err != nil {
+		fmt.Println("[GetClient] err", err)
+		return nil, mapError(err)
+	}
+	proto, _ := toProto(customer)
+	return toClient(proto), nil
+}
+
+func (s *CustomerServer) UpdateProfile(ctx context.Context, req *customerv1.UpdateProfileRequest) (*customerv1.Client, error) {
+	fmt.Println("[UpdateProfile] req", req)
+	md, _ := metadata.FromIncomingContext(ctx)
+	role := getMeta(md, "x-user-role")
+	UserID := getMeta(md, "x-user-id")
 
 	// Только CLIENT может редактировать свой профиль
 	if role != roles.Client {
 		return nil, status.Error(codes.PermissionDenied, "only CLIENT can update profile")
 	}
-	if customerID == "" {
-		return nil, status.Error(codes.FailedPrecondition, "customer_id required")
-	}
 
-	customer, err := s.updateProfile.Execute(ctx, customerID, usecase.UpdateProfileInput{
+	customer, err := s.updateProfile.Execute(ctx, UserID, usecase.UpdateProfileInput{
 		FirstName:   req.FirstName,
 		LastName:    req.LastName,
 		BirthDate:   req.BirthDate,
@@ -71,39 +98,103 @@ func (s *CustomerServer) UpdateProfile(ctx context.Context, req *customerv1.Upda
 		Citizenship: req.Citizenship,
 	})
 	if err != nil {
+		fmt.Println("[UpdateProfile] err", err)
 		return nil, mapError(err)
 	}
-	return toProto(customer), nil
+	proto, _ := toProto(customer)
+	return toClient(proto), nil
 }
 
 func (s *CustomerServer) GetCustomerStatus(ctx context.Context, req *customerv1.GetCustomerStatusRequest) (*customerv1.GetCustomerStatusResponse, error) {
-	customer, err := s.getStatus.Execute(ctx, req.CustomerId)
+	fmt.Println("[GetCustomerStatus] req", req)
+	md, _ := metadata.FromIncomingContext(ctx)
+	role := getMeta(md, "x-user-role")
+
+	if role != roles.Admin && role != roles.Officer {
+		return nil, mapError(domain.ErrAccessDenied)
+	}
+	customer, err := s.getStatus.Execute(ctx, req.UserId)
 	if err != nil {
+		fmt.Println("[GetCustomerStatus] err", err)
 		return nil, mapError(err)
 	}
 	return &customerv1.GetCustomerStatusResponse{
-		CustomerId: customer.ID,
-		Status:     customer.Status,
+		UserId: customer.UserID,
+		Status: customer.Status,
+	}, nil
+}
+
+func (s *CustomerServer) SystemGetCustomerStatus(ctx context.Context, req *customerv1.GetCustomerStatusRequest) (*customerv1.GetCustomerStatusResponse, error) {
+	fmt.Println("[SystemGetCustomerStatus] req", req)
+	customer, err := s.getStatus.Execute(ctx, req.UserId)
+	if err != nil {
+		fmt.Println("[SystemGetCustomerStatus] err", err)
+		return nil, mapError(err)
+	}
+	return &customerv1.GetCustomerStatusResponse{
+		UserId: customer.UserID,
+		Status: customer.Status,
+	}, nil
+}
+
+func (s *CustomerServer) SystemGetCustomer(ctx context.Context, req *customerv1.GetCustomerRequest) (*customerv1.GetCustomerResponse, error) {
+	fmt.Println("[SystemGetCustomer] req", req)
+	customer, err := s.getCustomer.Execute(ctx, req.UserId)
+	if err != nil {
+		fmt.Println("[SystemGetCustomer] err", err)
+		return nil, mapError(err)
+	}
+	return &customerv1.GetCustomerResponse{
+		UserId:    customer.UserID,
+		FirstName: customer.FirstName,
+		LastName:  customer.LastName,
+		BirthDate: customer.BirthDate.Format("2006-01-02"),
+	}, nil
+}
+
+func (s *CustomerServer) GetClientStatus(ctx context.Context, req *emptypb.Empty) (*customerv1.GetClientStatusResponse, error) {
+	fmt.Println("[GetCustomerStatus] req", req)
+	md, _ := metadata.FromIncomingContext(ctx)
+	role := getMeta(md, "x-user-role")
+	UserID := getMeta(md, "x-user-id")
+	customer, err := s.getStatus.Execute(ctx, UserID)
+
+	if role != roles.Client {
+		return nil, status.Error(codes.PermissionDenied, "only CLIENT can update self profile")
+	}
+
+	if err != nil {
+		fmt.Println("[GetCustomerStatus] err", err)
+		return nil, mapError(err)
+	}
+	return &customerv1.GetClientStatusResponse{
+		Status: customer.Status,
 	}, nil
 }
 
 func (s *CustomerServer) ListCustomers(ctx context.Context, req *customerv1.ListCustomersRequest) (*customerv1.ListCustomersResponse, error) {
+	fmt.Println("[ListCustomers] req", req)
 	md, _ := metadata.FromIncomingContext(ctx)
 	role := getMeta(md, "x-user-role")
 
-	res, err := s.listCustomers.Execute(ctx, role, domain.ListFilter{
+	if role != roles.Admin && role != roles.Officer {
+		return nil, mapError(domain.ErrAccessDenied)
+	}
+	res, err := s.listCustomers.Execute(ctx, domain.ListFilter{
 		Status: req.Status,
 		Search: req.Search,
 		Limit:  int(req.PageSize),
 		Cursor: req.PageToken,
 	})
 	if err != nil {
+		fmt.Println("[ListCustomers] err", err)
 		return nil, mapError(err)
 	}
 
 	out := make([]*customerv1.Customer, 0, len(res.Customers))
 	for i := range res.Customers {
-		out = append(out, toProto(&res.Customers[i]))
+		proto, _ := toProto(&res.Customers[i])
+		out = append(out, proto)
 	}
 	return &customerv1.ListCustomersResponse{
 		Customers:     out,
@@ -114,12 +205,13 @@ func (s *CustomerServer) ListCustomers(ctx context.Context, req *customerv1.List
 func getMeta(md metadata.MD, key string) string {
 	v := md.Get(key)
 	if len(v) == 0 {
+		fmt.Println("[customer.getMeta] not found ", key)
 		return ""
 	}
 	return v[0]
 }
 
-func toProto(c *domain.Customer) *customerv1.Customer {
+func toProto(c *domain.Customer) (*customerv1.Customer, error) {
 	birthDate := ""
 	if c.BirthDate != nil {
 		birthDate = c.BirthDate.Format("2006-01-02")
@@ -136,6 +228,19 @@ func toProto(c *domain.Customer) *customerv1.Customer {
 		Status:      c.Status,
 		CreatedAt:   c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		UpdatedAt:   c.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}, nil
+}
+func toClient(c *customerv1.Customer) *customerv1.Client {
+	return &customerv1.Client{
+		FirstName:   c.FirstName,
+		LastName:    c.LastName,
+		BirthDate:   c.BirthDate,
+		Address:     c.Address,
+		Phone:       c.Phone,
+		Citizenship: c.Citizenship,
+		Status:      c.Status,
+		CreatedAt:   c.CreatedAt,
+		UpdatedAt:   c.UpdatedAt,
 	}
 }
 
@@ -149,7 +254,7 @@ func mapError(err error) error {
 		return status.Error(codes.FailedPrecondition, "cannot edit profile after KYC started")
 	case errors.Is(err, domain.ErrInvalidProfile):
 		return status.Error(codes.InvalidArgument, "invalid profile data")
-	case errors.Is(err, domain.ErrCustomerIDRequired):
+	case errors.Is(err, domain.ErrUserIDRequired):
 		return status.Error(codes.FailedPrecondition, "customer_id required")
 	default:
 		return status.Error(codes.Internal, "internal error")

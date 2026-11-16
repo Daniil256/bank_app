@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: auth_db
     ports:
-      - "5432:5432"                    # ← ЭТА СТРОКА ОБЯЗАТЕЛЬНА
+      - "5432:5432"
     volumes:
       - auth_pg_data:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d

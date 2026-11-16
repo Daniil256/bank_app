@@ -1,0 +1,1 @@
+// Package adapter defines the inbound and outbound adapters for the document service\n// Inbound adapters handle incoming requests (e.g. gRPC), while outbound adapters manage outgoing interactions with external systems (e.g. PostgreSQL, MinIO).\n\npackage adapter

@@ -1,0 +1,1 @@
+// MinIO and PostgreSQL deployment configuration\n// This file defines the docker-compose setup for running both MinIO (object storage) and PostgreSQL (database) in a local development environment\n// It includes services for each component, volumes, networks, and environment variables to configure their behavior.

@@ -1,0 +1,317 @@
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@user_id = b6edb92a-27ca-42b6-a88b-0dd59a4dc596
+@clientEmail = daniil_user@email.com
+@clientPassword = password
+@clientAccessToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiNmVkYjkyYS0yN2NhLTQyYjYtYTg4Yi0wZGQ1OWE0ZGM1OTYiLCJyb2xlIjoiQ0xJRU5UIiwidHlwZSI6ImFjY2VzcyIsImlzcyI6ImF1dGgtc2VydmljZSIsImF1ZCI6WyJhcGktZ2F0ZXdheSJdLCJleHAiOjE3OTQ2NjA1MDQsIm5iZiI6MTc5NDY1OTYwNCwiaWF0IjoxNzk0NjU5NjA0LCJqdGkiOiIxNzk0NjU5NjA0OTM3NDY1NTAwIn0.THyUE0LE77BGj-_f1WYXd2XE5l4rYXfIj4W4hYQn3FfJeLFkw71km_QxLPoaOOwYIP0MuK1gCKPgguZg-jaFmvPlSZSQDBra5KoALKm8YAuEDVDhWHa_JA3sG34rIYKDvfF-584V733E7zApWRSpAc7QwB0d5PnqnJzs57-lZSCTiTh9sD5iLLBmNOl3Pu8NTAYYtLKoFJaP6Lo1Lil1wTqJMeEjeGoZMmzxpCRwrpJHftjShGWhlA5KPCB7SNMemUKDTE2SkCxx0_xr2RYzyeDlvBkGUoG-UM1xKIKoIxC3C9QAbP1WmCXPyMlCFDyCJDoLk9ekYB4dso4E8-4dag
+@client2AccessToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZDM0MWY4OC1hMGEyLTRmNzgtYmVkOS01MDQ1M2ZmZjhlMDAiLCJyb2xlIjoiQ0xJRU5UIiwidHlwZSI6ImFjY2VzcyIsImlzcyI6ImF1dGgtc2VydmljZSIsImF1ZCI6WyJhcGktZ2F0ZXdheSJdLCJleHAiOjE3OTQ2NjA4ODgsIm5iZiI6MTc5NDY1OTk4OCwiaWF0IjoxNzk0NjU5OTg4LCJqdGkiOiIxNzk0NjU5OTg4NTUwMjg1OTAwIn0.ff0lXMwOTpYhUXYYV_f-P63XSXwjqV1iXUcStff3hmpE9jVUhI_fYhSZg11MbYW_qpdr9BUilCkHbiqGAI_FwrySKrPNlrjVNk9WnX7WytHci7lS85EDlusKJtAALpoK86QHOTLTMHcPi2SVG7ev8NKIRMXqcyBeISkq2ftfE8shbulj4Z-EV26Yh8aru1XoTGNiLzCSXpgd8W7gSU2dPZENymbTT9sippI3O2z7CmFwSiorBszHdfnMOLWxnzbfROCBtKN0XWIKmWdftmXOCCgJSPGAQWR_1zyANZ2Ydpotz6MDiz747iu_ChpGmtcCQrm18WfQK_yy1bV32gBJxQ
+
+#@officer_user_id = 2d341f88-a0a2-4f78-bed9-50453fff8e00
+@officerEmail = daniilOfficer@email.com
+@officerPassword = password
+@officerAccessToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4ODEwYjAyYi0zYTQ4LTQ2NDItYTBlMS0xYWQzMTY4NjI4NTEiLCJyb2xlIjoiT0ZGSUNFUiIsInR5cGUiOiJhY2Nlc3MiLCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJhdWQiOlsiYXBpLWdhdGV3YXkiXSwiZXhwIjoxNzk0NjYwNTIwLCJuYmYiOjE3OTQ2NTk2MjAsImlhdCI6MTc5NDY1OTYyMCwianRpIjoiMTc5NDY1OTYyMDg2MDI1MzcwMCJ9.pNYAUoXXuGFw5qFVa5cQsm17a3FKGdKxTEkA0Dh0hRipREDXcjIR0SAUgmufi28K4IBOFAMZ36WY5WjeaV0d9kcQ_JpJdevTR6Bqy9niKTkeKcaAFG9rjz8d1obZ3MPvBhHaivucJLEziSwCkS05vqWeE1FkVA9YpUqr18HWj2eBW9KKpzy-TVKmd3xj-ch73O4q8IImS0R_CpkfsfeF-VA5a_vQUTAKCNfnRJ0QaYTMUn91eFynw1QqcFybphkqDwVNO4paOGQEa7Jzc99un4nQeXEszZt4lx2q7Gh34yixAStsjeo3cNzdkL7jZjcM_PJq70KNwXFrQuDY6b9ZQA
+
+@application_id = 01a1ac89-4aae-777a-9b4f-31ee2ecf36f4
+@application_id_r = 01a1ac98-bffd-7c33-adb4-c0af18dde9b8
+@documentId = 01a1d9c7-6e31-727b-ae55-11862c688917
+@downlodUrl = http://127.0.0.1:9000/documents/customers/b6edb92a-27ca-42b6-a88b-0dd59a4dc596/PASSPORT/37871568-a9cf-4c98-9c69-e464ab6adcf0?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20261114%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261114T110557Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=63c8e524ae3fd68798836322609d568a5e3611ceb14dfdba3c0078adb132274a
+### ============================================
+# @name clientLogin
+POST {{baseUrl}}/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{clientEmail}}",
+  "password": "{{clientPassword}}"
+}
+
+
+### ============================================
+# @name officerLogin
+POST {{baseUrl}}/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "{{officerEmail}}",
+  "password": "{{officerPassword}}"
+}
+
+### CLIENT_2 LOGIN
+POST {{baseUrl}}/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "daniil_user_2@email.com",
+  "password": "password"
+}
+### ============================================
+### 1. InitUpload — PASSPORT (успех)
+### ============================================
+
+# @name initPassport
+POST {{baseUrl}}/v1/documents/init-upload
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "doc_type": "PASSPORT"
+}
+
+### Ожидаемый ответ 200:
+# {
+#   "document_id": "550e8400-...",
+#   "upload_url": "http://localhost:9000/documents/customers/.../PASSPORT/...?X-Amz-Algorithm=...",
+#   "object_key": "customers/.../PASSPORT/..."
+# }
+
+
+### ============================================
+### 2. InitUpload — SELFIE (успех)
+### ============================================
+
+# @name initSelfie
+POST {{baseUrl}}/v1/documents/init-upload
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "doc_type": "SELFIE"
+}
+
+
+### ============================================
+### 3. InitUpload — PROOF_OF_ADDRESS (успех)
+### ============================================
+
+# @name initAddress
+POST {{baseUrl}}/v1/documents/init-upload
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "doc_type": "PROOF_OF_ADDRESS"
+}
+
+### ============================================
+### 7. Загрузка файла в MinIO (PUT по presigned URL)
+### ============================================
+### ВАЖНО: это НЕ gRPC, а прямой PUT в MinIO.
+### В .http файле можно использовать < ./file.pdf для бинарного файла,
+### но проще — через curl (см. ниже).
+
+# curl -X PUT http://127.0.0.1:9000/documents/customers/b6edb92a-27ca-42b6-a88b-0dd59a4dc596/PASSPORT/4610ccca-9595-4e76-ae64-82998d27ddc2?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20261114%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261114T111808Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=54e35bbba539fe7bfc642be5eac076d3285afe3cc76a5a698ed413220c3fb80a" --upload-file passport.pdf -H "Content-Type: application/pdf"
+
+### ============================================
+### 8. ConfirmUpload — PASSPORT (успех)
+### ============================================
+### Предусловие: файл загружен в MinIO (шаг 7)
+
+# @name confirmPassport
+POST {{baseUrl}}/v1/documents/confirm
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "document_id": "{{documentId}}"
+}
+
+### Ожидаемый ответ 200:
+# {
+#   "id": "550e8400-...",
+#   "customerId": "...",
+#   "docType": "PASSPORT",
+#   "status": "CONFIRMED",
+#   "sizeBytes": 12345,
+#   "mimeType": "application/pdf",
+#   "sha256": "abc123...",
+#   "createdAt": "...",
+#   "confirmedAt": "..."
+# }
+
+### ============================================
+### 9. ConfirmUpload — повторно (412 FailedPrecondition)
+### ============================================
+
+POST {{baseUrl}}/v1/documents/confirm
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "document_id": "{{documentId}}"
+}
+
+### Ожидаемый ответ 412:
+# {
+#   "code": 412,
+#   "message": "document already confirmed"
+# }
+
+### ============================================
+### 10. ConfirmUpload — файл не загружен (412)
+### ============================================
+### Создаём документ, но НЕ загружаем файл в MinIO
+
+# @name initNoFile
+POST {{baseUrl}}/v1/documents/init-upload
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "doc_type": "SELFIE"
+}
+
+###
+
+POST {{baseUrl}}/v1/documents/confirm
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "document_id": "01a1d9ca-3dc7-7052-8763-2fe3e397c11c"
+}
+
+### Ожидаемый ответ 412:
+# {
+#   "code": 412,
+#   "message": "file not uploaded to storage"
+# }
+
+### ============================================
+### 11. ConfirmUpload — несуществующий document_id (404)
+### ============================================
+
+POST {{baseUrl}}/v1/documents/confirm
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "document_id": "00000000-0000-0000-0000-000000000000"
+}
+
+### Ожидаемый ответ 404:
+# {
+#   "code": 404,
+#   "message": "document not found"
+# }
+
+### ============================================
+### 12. ConfirmUpload — чужой документ (403)
+### ============================================
+### CLIENT пытается подтвердить документ другого клиента
+
+POST {{baseUrl}}/v1/documents/confirm
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "document_id": "{{documentId}}"
+}
+
+### Ожидаемый ответ 403:
+# {
+#   "code": 403,
+#   "message": "access denied"
+# }
+
+### ============================================
+### 13. ConfirmUpload — невалидный MIME (400)
+### ============================================
+### Загружаем .txt вместо jpeg/png/pdf
+
+# @name initTxt
+POST {{baseUrl}}/v1/documents/init-upload
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "doc_type": "PASSPORT"
+}
+
+###
+@txtDocumentId = 01a1d9cd-426b-72ce-9748-624dc5c7b13a
+@txtUploadUrl = "http://127.0.0.1:9000/documents/customers/b6edb92a-27ca-42b6-a88b-0dd59a4dc596/PASSPORT/aa820cbc-35d0-4159-ad9e-ab6fc7f3a245?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20261114%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261114T112430Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=7e3f0f9dff7700175e3d37afe1b2b70661cd803cfa26afba7ee14769880e6a59"
+
+# curl -X PUT "http://127.0.0.1:9000/documents/customers/b6edb92a-27ca-42b6-a88b-0dd59a4dc596/PASSPORT/aa820cbc-35d0-4159-ad9e-ab6fc7f3a245?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20261114%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261114T112430Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=7e3f0f9dff7700175e3d37afe1b2b70661cd803cfa26afba7ee14769880e6a59" --upload-file sql.txt -H "Content-Type: text/plain"
+
+POST {{baseUrl}}/v1/documents/confirm
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "document_id": "{{txtDocumentId}}"
+}
+
+### Ожидаемый ответ 400:
+# {
+#   "code": 400,
+#   "message": "invalid mime type (jpeg/png/pdf only)"
+# }
+
+### ============================================
+### 14. ConfirmUpload — файл > 10 МБ (400)
+### ============================================
+
+# @name initBig
+POST {{baseUrl}}/v1/documents/init-upload
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "doc_type": "SELFIE"
+}
+
+###
+@bigDocumentId = 01a1d9d1-0127-7180-998d-af80ca35d68f
+
+# curl -X PUT "http://127.0.0.1:9000/documents/customers/b6edb92a-27ca-42b6-a88b-0dd59a4dc596/SELFIE/59830747-7a71-4879-87fd-368e5382c389?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20261114%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261114T112835Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=f1cc938aa7021305fb04d9e6790e28527cf50ef5cd491a22af6da51da5269d9e" --upload-file big-file.pdf -H "Content-Type: application/pdf"
+
+POST {{baseUrl}}/v1/documents/confirm
+Content-Type: {{contentType}}
+Authorization: Bearer {{clientAccessToken}}
+
+{
+  "document_id": "{{bigDocumentId}}"
+}
+
+### Ожидаемый ответ 400:
+# {
+#   "code": 400,
+#   "message": "file too large (max 10 MB)"
+# }
+
+
+#
+#
+#
+### ListDocuments — CLIENT (свои)
+GET {{baseUrl}}/v1/documents
+Authorization: Bearer {{clientAccessToken}}
+
+### ListDocuments — с фильтром по типу
+GET {{baseUrl}}/v1/documents?docType=SELFIE
+Authorization: Bearer {{clientAccessToken}}
+
+### ListDocuments — OFFICER (по customer_id)
+GET {{baseUrl}}/v1/documents?customerId={{user_id}}
+Authorization: Bearer {{officerAccessToken}}
+
+### GetDownloadUrl — CLIENT (свой)
+GET {{baseUrl}}/v1/documents/{{documentId}}/download
+Authorization: Bearer {{clientAccessToken}}
+
+### GetDownloadUrl — OFFICER
+GET {{baseUrl}}/v1/documents/{{documentId}}/download
+Authorization: Bearer {{officerAccessToken}}
+
+### GetDownloadUrl — несуществующий (404)
+GET {{baseUrl}}/v1/documents/00000000-0000-0000-0000-000000000000/download
+Authorization: Bearer {{clientAccessToken}}
+
+### GetDownloadUrl — не CONFIRMED (412)
+### (создайте InitUpload без Confirm)
+GET {{baseUrl}}/v1/documents/01a1da10-056e-7b01-a225-e29651639391/download
+Authorization: Bearer {{clientAccessToken}}
+
+### GetDownloadUrl — чужой документ (403)
+GET {{baseUrl}}/v1/documents/{{documentId}}/download
+Authorization: Bearer {{client2AccessToken}}

@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package kyc.v1;
+
+option go_package = "kyc-service/proto/kyc/v1;kycv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service KycService {
+  rpc SubmitApplication(google.protobuf.Empty) returns (Application) {
+    option (google.api.http) = { post: "/v1/kyc/applications" body: "*" };
+  }
+  rpc GetApplication(GetApplicationRequest) returns (Application) {
+    option (google.api.http) = { get: "/v1/kyc/applications/{application_id}" };
+  }
+  rpc GetClientApplication(google.protobuf.Empty) returns (Application) {
+    option (google.api.http) = { get: "/v1/kyc/applications/me" };
+  }
+  rpc ListApplications(ListApplicationsRequest) returns (ListApplicationsResponse) {
+    option (google.api.http) = { get: "/v1/kyc/applications" };
+  }
+  rpc ClaimApplication(ClaimApplicationRequest) returns (Application) {
+    option (google.api.http) = { post: "/v1/kyc/applications/{application_id}/claim" };
+  }
+  rpc ApproveApplication(ApproveApplicationRequest) returns (Application) {
+    option (google.api.http) = { post: "/v1/kyc/applications/{application_id}/approve" };
+  }
+  rpc RejectApplication(RejectApplicationRequest) returns (Application) {
+    option (google.api.http) = {
+      post: "/v1/kyc/applications/{application_id}/reject"
+      body: "*"
+    };
+  }
+}
+
+message Application {
+  string id               = 1;
+  string user_id          = 2;
+  string status           = 3;
+  string claimed_by       = 4;
+  string rejection_reason = 5;
+  string created_at       = 6;
+  string updated_at       = 7;
+}
+
+message GetApplicationRequest {
+  string application_id = 1;
+}
+message ListApplicationsRequest {
+  string status     = 1;
+  int32  page_size  = 2;
+  string page_token = 3;
+}
+
+message ListApplicationsResponse {
+  repeated Application applications     = 1;
+  string               next_page_token  = 2;
+}
+
+message ClaimApplicationRequest {
+  string application_id = 1;
+}
+
+message ApproveApplicationRequest {
+  string application_id = 1;
+}
+
+message RejectApplicationRequest {
+  string application_id = 1;
+  string reason         = 2;
+}

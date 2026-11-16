@@ -2,13 +2,15 @@ package http
 
 import (
 	"api-gateway/internal/adapter/outbound/auth"
-	customerv1 "api-gateway/proto/bank/v1"
 	"context"
 	"fmt"
 	"google.golang.org/grpc/metadata"
 	"net/http"
 
 	authv1 "api-gateway/proto/auth/v1"
+	customerv1 "api-gateway/proto/customer/v1"
+	doc1 "api-gateway/proto/document/v1"
+	kyc1 "api-gateway/proto/kyc/v1"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -16,7 +18,7 @@ import (
 )
 
 // NewMux создаёт grpc-gateway ServeMux и регистрирует все сервисы
-func NewMux(ctx context.Context, GRPCAuthEndpoint, GRPCCustomerEndpoint string) (http.Handler, error) {
+func NewMux(ctx context.Context, GRPCAuthEndpoint, GRPCCustomerEndpoint, GrpcKycEndpoint, GRPCDocumentEndpoint string) (http.Handler, error) {
 	mux := runtime.NewServeMux(
 		runtime.WithErrorHandler(errorHandler),
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
@@ -35,9 +37,6 @@ func NewMux(ctx context.Context, GRPCAuthEndpoint, GRPCCustomerEndpoint string) 
 				}
 				if role, ok := claims["role"].(string); ok {
 					md.Set("x-user-role", role)
-				}
-				if cid, ok := claims["customer_id"].(string); ok && cid != "" {
-					md.Set("x-customer-id", cid)
 				}
 				if jti, ok := claims["jti"].(string); ok {
 					md.Set("x-jti", jti)
@@ -58,6 +57,14 @@ func NewMux(ctx context.Context, GRPCAuthEndpoint, GRPCCustomerEndpoint string) 
 
 	if err := customerv1.RegisterCustomerServiceHandlerFromEndpoint(ctx, mux, GRPCCustomerEndpoint, opts); err != nil {
 		return nil, fmt.Errorf("register customer service: %w", err)
+	}
+
+	if err := kyc1.RegisterKycServiceHandlerFromEndpoint(ctx, mux, GrpcKycEndpoint, opts); err != nil {
+		return nil, fmt.Errorf("register KYC service: %w", err)
+	}
+
+	if err := doc1.RegisterDocumentServiceHandlerFromEndpoint(ctx, mux, GRPCDocumentEndpoint, opts); err != nil {
+		return nil, fmt.Errorf("register document service: %w", err)
 	}
 
 	return mux, nil

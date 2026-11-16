@@ -13,10 +13,9 @@ import (
 
 // Claims — что кладём в access-токен
 type Claims struct {
-	UserID     string `json:"sub"`         // ID пользователя
-	Role       string `json:"role"`        // CLIENT / OFFICER / ADMIN
-	CustomerID string `json:"customer_id"` // ID клиента (если есть)
-	Type       string `json:"type"`        // "access" или "refresh"
+	UserID string `json:"sub"`  // ID пользователя
+	Role   string `json:"role"` // CLIENT / OFFICER / ADMIN
+	Type   string `json:"type"` // "access" или "refresh"
 	jwt.RegisteredClaims
 }
 
@@ -63,15 +62,14 @@ func NewSigner(privateKeyPath, issuer string, accessTTL, refreshTTL time.Duratio
 }
 
 // SignAccess — подписывает access-токен
-func (s *Signer) SignAccess(userID, role, customerID string) (string, int64, error) {
+func (s *Signer) SignAccess(userID, role string) (string, int64, error) {
 	now := time.Now()
 	expiresAt := now.Add(s.accessTTL)
 
 	claims := Claims{
-		UserID:     userID,
-		Role:       role,
-		CustomerID: customerID,
-		Type:       "access",
+		UserID: userID,
+		Role:   role,
+		Type:   "access",
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    s.issuer,
 			Subject:   userID,

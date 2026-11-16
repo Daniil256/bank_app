@@ -97,13 +97,6 @@ func isPublicPath(path string) bool {
 	return false
 }
 
-func getString(m jwt.MapClaims, key string) string {
-	if v, ok := m[key].(string); ok {
-		return v
-	}
-	return ""
-}
-
 func writeJSONError(w http.ResponseWriter, code int, msg string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)

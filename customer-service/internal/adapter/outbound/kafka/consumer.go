@@ -2,79 +2,204 @@ package kafka
 
 import (
 	"context"
+	"customer-service/internal/domain"
 	"encoding/json"
 	"log"
 	"time"
 
 	"bank_app/shared/roles"
+
+	"github.com/segmentio/kafka-go"
 )
 
-// StatusUpdater — минимальный интерфейс, чтобы не тащить весь репозиторий
+const (
+	TopicAuthEvents = "auth.events"
+	TopicKycEvents  = "kyc.events"
+	GroupID         = "customer-service-group"
+)
+
 type StatusUpdater interface {
-	UpdateStatus(ctx context.Context, customerID, status string) error
+	UpdateStatus(ctx context.Context, userID, status string) error
 }
 
-// Event — конверт Kafka-события
+// CustomerCreator — интерфейс для создания клиента (реализуется репозиторием)
+type CustomerCreator interface {
+	Create(ctx context.Context, customer *domain.Customer) error
+}
+
 type Event struct {
 	EventID    string          `json:"event_id"`
 	EventType  string          `json:"event_type"`
-	OccurredAt time.Time       `json:"occurred_at"`
+	OccurredAt string          `json:"occurred_at"`
 	Payload    json.RawMessage `json:"payload"`
 }
 
-// KycPayload — payload событий kyc.*
+type AuthPayload struct {
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
+}
+
 type KycPayload struct {
 	ApplicationID string `json:"application_id"`
-	CustomerID    string `json:"customer_id"`
+	UserID        string `json:"user_id"`
 	Reason        string `json:"reason,omitempty"`
 }
 
-// Consumer — заглушка консьюмера Kafka.
-// В реальном проекте: kafka-go / segmentio/kafka-go reader,
-// дедупликация по event_id (Redis/БД), retry, DLQ.
 type Consumer struct {
-	updater StatusUpdater
-	brokers string
-	topics  []string
+	updater    StatusUpdater
+	creator    CustomerCreator
+	authReader *kafka.Reader
+	kycReader  *kafka.Reader
 }
 
-func NewConsumer(brokers string, updater StatusUpdater) *Consumer {
+func NewConsumer(broker string, updater StatusUpdater, creator CustomerCreator) *Consumer {
+	// Reader для auth.events (создание клиентов)
+	authReader := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{broker},
+		Topic:    TopicAuthEvents,
+		GroupID:  GroupID,
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
+		MaxWait:  500 * time.Millisecond,
+	})
+
+	// Reader для kyc.events (обновление статуса)
+	kycReader := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{broker},
+		Topic:    TopicKycEvents,
+		GroupID:  GroupID,
+		MinBytes: 10e3,
+		MaxBytes: 10e6,
+		MaxWait:  500 * time.Millisecond,
+	})
+
 	return &Consumer{
-		updater: updater,
-		brokers: brokers,
-		topics:  []string{"kyc.events"},
+		updater:    updater,
+		creator:    creator,
+		authReader: authReader,
+		kycReader:  kycReader,
 	}
 }
 
-// Run — заглушка: не подключается к Kafka, только логирует.
-// Реальная реализация должна читать сообщения из топика kyc.events
-// и вызывать handle(event).
+func (c *Consumer) Close() error {
+	if err := c.authReader.Close(); err != nil {
+		return err
+	}
+	return c.kycReader.Close()
+}
+
+// Run — запускает два горутин-цикла для чтения из двух топиков
 func (c *Consumer) Run(ctx context.Context) error {
-	log.Printf("[kafka.consumer] stub started (brokers=%s, topics=%v)", c.brokers, c.topics)
+	go c.consumeAuthEvents(ctx)
+	go c.consumeKycEvents(ctx)
 	<-ctx.Done()
-	log.Println("[kafka.consumer] stopped")
 	return nil
 }
 
-// handle — обработка одного события (используется и в тестах)
-func (c *Consumer) handle(ctx context.Context, e Event) error {
-	var p KycPayload
-	if err := json.Unmarshal(e.Payload, &p); err != nil {
-		log.Printf("[kafka.consumer] bad payload event_id=%s: %v", e.EventID, err)
+func (c *Consumer) consumeAuthEvents(ctx context.Context) {
+	log.Println("[kafka.consumer] auth.events consumer started")
+	for {
+		msg, err := c.authReader.FetchMessage(ctx)
+		if err != nil {
+			if ctx.Err() != nil {
+				return // context cancelled
+			}
+			log.Printf("[kafka.consumer] auth.events fetch error: %v", err)
+			continue
+		}
+
+		var event Event
+		if err := json.Unmarshal(msg.Value, &event); err != nil {
+			log.Printf("[kafka.consumer] auth.events bad json: %v", err)
+			c.commit(ctx, c.authReader, msg) // пропускаем битое сообщение
+			continue
+		}
+
+		if event.EventType == "auth.user_registered" {
+			if err := c.handleUserRegistered(ctx, event.Payload); err != nil {
+				log.Printf("[kafka.consumer] auth.events handle error: %v", err)
+				// не коммитим — попробуем снова
+				continue
+			}
+		}
+
+		if err := c.authReader.CommitMessages(ctx, msg); err != nil {
+			log.Printf("[kafka.consumer] auth.events commit error: %v", err)
+		}
+	}
+}
+
+func (c *Consumer) consumeKycEvents(ctx context.Context) {
+	log.Println("[kafka.consumer] kyc.events consumer started")
+	for {
+		msg, err := c.kycReader.FetchMessage(ctx)
+		if err != nil {
+			if ctx.Err() != nil {
+				return
+			}
+			log.Printf("[kafka.consumer] kyc.events fetch error: %v", err)
+			continue
+		}
+
+		var event Event
+		if err := json.Unmarshal(msg.Value, &event); err != nil {
+			log.Printf("[kafka.consumer] kyc.events bad json: %v", err)
+			c.commit(ctx, c.kycReader, msg)
+			continue
+		}
+
+		var p KycPayload
+		if err := json.Unmarshal(event.Payload, &p); err != nil {
+			log.Printf("[kafka.consumer] kyc.events bad payload: %v", err)
+			c.commit(ctx, c.kycReader, msg)
+			continue
+		}
+
+		switch event.EventType {
+		case "kyc.application_approved":
+			log.Printf("[kafka.consumer] kyc.application_approved customer_id=%s", p.UserID)
+			if err := c.updater.UpdateStatus(ctx, p.UserID, roles.StatusActive); err != nil {
+				log.Printf("[kafka.consumer] update status error: %v", err)
+				continue // не коммитим
+			}
+		case "kyc.application_rejected":
+			log.Printf("[kafka.consumer] kyc.application_rejected customer_id=%s", p.UserID)
+			if err := c.updater.UpdateStatus(ctx, p.UserID, roles.StatusRejected); err != nil {
+				log.Printf("[kafka.consumer] update status error: %v", err)
+				continue
+			}
+		default:
+			log.Printf("[kafka.consumer] ignore event_type=%s", event.EventType)
+		}
+
+		if err := c.kycReader.CommitMessages(ctx, msg); err != nil {
+			log.Printf("[kafka.consumer] kyc.events commit error: %v", err)
+		}
+	}
+}
+
+func (c *Consumer) handleUserRegistered(ctx context.Context, payload json.RawMessage) error {
+	var p AuthPayload
+	if err := json.Unmarshal(payload, &p); err != nil {
 		return err
 	}
 
-	switch e.EventType {
-	case "kyc.application_approved":
-		log.Printf("[kafka.consumer] kyc.application_approved customer_id=%s", p.CustomerID)
-		return c.updater.UpdateStatus(ctx, p.CustomerID, roles.StatusActive)
+	// Создаём клиента со статусом NEW
+	customer := &domain.Customer{
+		UserID: p.UserID,
+		Status: roles.StatusNew,
+	}
+	if err := c.creator.Create(ctx, customer); err != nil {
+		// Если клиент уже существует — это ок (идемпотентность)
+		log.Printf("[kafka.consumer] create customer (may already exist): %v", err)
+	}
+	log.Printf("[kafka.consumer] auth.user_registered handled: user_id=%s", p.UserID)
+	return nil
+}
 
-	case "kyc.application_rejected":
-		log.Printf("[kafka.consumer] kyc.application_rejected customer_id=%s reason=%s", p.CustomerID, p.Reason)
-		return c.updater.UpdateStatus(ctx, p.CustomerID, roles.StatusRejected)
-
-	default:
-		log.Printf("[kafka.consumer] ignore event_type=%s", e.EventType)
-		return nil
+func (c *Consumer) commit(ctx context.Context, r *kafka.Reader, msg kafka.Message) {
+	log.Println("[kafka.commit] msg", msg)
+	if err := r.CommitMessages(ctx, msg); err != nil {
+		log.Printf("[kafka.commit] commit error: %v", err)
 	}
 }

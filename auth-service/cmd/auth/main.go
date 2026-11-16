@@ -60,6 +60,10 @@ func main() {
 		log.Fatal("jwt signer:", err)
 	}
 
+	// Кафка
+	producer := kafka.NewProducer(cfg.KafkaBroker)
+	defer producer.Close()
+
 	// Репозитории
 	userRepo := postgres.NewUserRepository(db)
 	refreshRepo := postgres.NewRefreshTokenRepository(db)

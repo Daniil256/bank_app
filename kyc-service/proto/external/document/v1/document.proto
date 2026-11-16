@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package document.v1;
+
+option go_package = "document-service/proto/document/v1;documentv1";
+
+service DocumentService {
+  rpc HasRequiredDocuments(HasRequiredDocumentsRequest) returns (HasRequiredDocumentsResponse) {
+  }
+}
+
+message HasRequiredDocumentsRequest {
+  string customer_id = 1;
+}
+
+message HasRequiredDocumentsResponse {
+  bool has_passport = 1;
+  bool has_selfie   = 2;
+}

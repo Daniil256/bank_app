@@ -52,6 +52,13 @@ func main() {
 
 	// Kafka
 	producer := kafka.NewProducer(cfg.KafkaBrokers)
+	consumer := kafka.NewConsumer(cfg.KafkaBrokers, repo, repo) // repo реализует StatusUpdater и CustomerCreator
+	go func() {
+		if err := consumer.Run(context.Background()); err != nil {
+			log.Printf("[kafka.consumer] error: %v", err)
+		}
+	}()
+	defer consumer.Close()
 
 	// Use cases
 	listUC := usecase.NewListCustomersUseCase(repo)
@@ -67,14 +74,6 @@ func main() {
 	grpcServer := grpc.NewServer()
 	customerv1.RegisterCustomerServiceServer(grpcServer,
 		grpcadapter.NewCustomerServer(getCustomerUC, updateProfileUC, getStatusUC, listUC))
-
-	// Kafka consumer (заглушка)
-	consumer := kafka.NewConsumer(cfg.KafkaBrokers, repo)
-	go func() {
-		if err := consumer.Run(context.Background()); err != nil {
-			log.Printf("[kafka.consumer] error: %v", err)
-		}
-	}()
 
 	healthServer := health.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)

@@ -26,7 +26,12 @@ func main() {
 
 	// gRPC-gateway mux
 	ctx := context.Background()
-	mux, err := myHttp.NewMux(ctx, cfg.GRPCAuthEndpoint, cfg.GRPCCustomerEndpoint)
+	mux, err := myHttp.NewMux(ctx,
+		cfg.GRPCAuthEndpoint,
+		cfg.GRPCCustomerEndpoint,
+		cfg.GrpcKycEndpoint,
+		cfg.GrpcDocumentEndpoint,
+	)
 	if err != nil {
 		log.Fatal("http mux: ", err)
 	}
